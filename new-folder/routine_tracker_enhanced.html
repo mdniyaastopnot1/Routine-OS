@@ -1,1 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoutineOS — Your Daily Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05070f;
+  --surface: #0d1120;
+  --card: #111827;
+  --card2: #161f33;
+  --border: #1e2d4a;
+  --border2: #253659;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,0.25);
+  --teal: #14b8a6;
+  --teal-glow: rgba(20,184,166,0.2);
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --violet: #8b5cf6;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #4b6080;
+  --done-bg: #0d1f1a;
+  --done-border: #14b8a6;
+  --r: 0.9rem;
+  --r2: 1.2rem;
+  --r3: 1.6rem;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% -5%, rgba(59,130,246,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 90% 90%, rgba(20,184,166,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 60% 50%, rgba(139,92,246,0.05) 0%, transparent 55%);
+}
 
+/* ═══════════════════════════════════════════════════════════
+   ONBOARDING / LOGIN SCREEN
+═══════════════════════════════════════════════════════════ */
+#onboard-screen {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+#onboard-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.onboard-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 2rem;
+  padding: 3rem 2.5rem;
+  width: 100%; max-width: 480px;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08);
+  animation: slideUp 0.6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(40px) scale(0.97); }
+  to   { opacity:1; transform: none; }
+}
+.brand-logo {
+  display: flex; align-items: center; gap: 0.7rem;
+  margin-bottom: 2.5rem;
+}
+.brand-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.3);
+}
+.brand-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem; font-weight: 800;
+  background: linear-gradient(90deg, #e2e8f0, #94a3b8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.brand-tag { font-size: 0.7rem; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+.onboard-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem; font-weight: 800; line-height: 1.15;
+  margin-bottom: 0.6rem; color: var(--text);
+}
+.onboard-title span { color: var(--accent); }
+.onboard-sub { font-size: 0.9rem; color: var(--text2); margin-bottom: 2rem; line-height: 1.6; }
+
+.tab-row {
+  display: flex; background: var(--surface); border-radius: 0.8rem;
+  padding: 0.25rem; gap: 0.25rem; margin-bottom: 1.8rem;
+}
+.tab-btn {
+  flex: 1; padding: 0.6rem; border: none; border-radius: 0.6rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; color: var(--text2); background: none;
+}
+.tab-btn.active { background: var(--card2); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+.form-group { margin-bottom: 1.2rem; }
+.form-label {
+  display: block; font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3);
+  margin-bottom: 0.45rem; font-family: 'DM Mono', monospace;
+}
+.form-input {
+  width: 100%; padding: 0.75rem 1rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.form-input::placeholder { color: var(--text3); }
+
+.btn-full {
+  width: 100%; padding: 0.85rem;
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  border: none; border-radius: var(--r); color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
+  box-shadow: 0 8px 24px rgba(59,130,246,0.35);
+  margin-top: 0.5rem;
+}
+.btn-full:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(59,130,246,0.45); }
+.btn-full:active { transform: translateY(0); }
+
+.form-error {
+  font-size: 0.78rem; color: var(--rose);
+  margin-top: 0.5rem; display: none;
+}
+.form-error.show { display: block; }
+.existing-users { margin-top: 1.5rem; }
+.eu-label { font-size: 0.72rem; color: var(--text3); margin-bottom: 0.6rem; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+.user-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.user-chip {
+  padding: 0.35rem 0.8rem; background: var(--surface);
+  border: 1px solid var(--border2); border-radius: 99px;
+  font-size: 0.78rem; color: var(--text2); cursor: pointer; transition: all 0.15s;
+}
+.user-chip:hover { border-color: var(--accent); color: var(--text); }
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN APP
+═══════════════════════════════════════════════════════════ */
+#app-screen { display: none; }
+#app-screen.active { display: block; }
+
+/* HEADER */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(13,17,32,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+  flex-wrap: wrap; gap: 0.7rem;
+}
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-brand {
+  font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800;
+  background: linear-gradient(90deg, var(--accent), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.user-greeting {
+  font-size: 0.8rem; color: var(--text2);
+  background: var(--card); border: 1px solid var(--border); border-radius: 99px;
+  padding: 0.3rem 0.9rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.user-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.header-right { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.date-badge {
+  font-size: 0.78rem; color: var(--text2);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 99px; padding: 0.3rem 0.9rem;
+  font-family: 'DM Mono', monospace;
+}
+.hdr-btn {
+  padding: 0.35rem 0.9rem; border-radius: 99px;
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; border: 1px solid var(--border2); transition: all 0.15s;
+}
+.hdr-btn.add { background: linear-gradient(135deg, var(--accent), var(--teal)); color: #fff; border: none; box-shadow: 0 4px 16px rgba(59,130,246,0.25); }
+.hdr-btn.add:hover { box-shadow: 0 6px 20px rgba(59,130,246,0.4); transform: translateY(-1px); }
+.hdr-btn.logout { background: none; color: var(--text2); }
+.hdr-btn.logout:hover { border-color: var(--rose); color: var(--rose); }
+.hdr-btn.report { background: none; color: var(--text2); }
+.hdr-btn.report:hover { border-color: var(--amber); color: var(--amber); }
+
+/* STATS BAR */
+.stats-bar {
+  display: flex; gap: 1rem; padding: 1.2rem 2rem;
+  flex-wrap: wrap; border-bottom: 1px solid var(--border);
+}
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 0.9rem 1.4rem;
+  flex: 1; min-width: 130px;
+  display: flex; flex-direction: column; gap: 0.2rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); font-family: 'DM Mono', monospace; }
+.stat-val { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+.sv-blue { color: var(--accent); }
+.sv-teal { color: var(--teal); }
+.sv-amber { color: var(--amber); }
+.sv-rose { color: var(--rose); }
+
+/* PROGRESS */
+.progress-wrap { padding: 0.8rem 2rem 1rem; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text3); margin-bottom: 0.4rem; font-family: 'DM Mono', monospace; }
+.progress-track { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal));
+  border-radius: 99px; transition: width 0.8s cubic-bezier(.4,0,.2,1); width: 0%;
+  position: relative;
+}
+.progress-fill::after {
+  content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--teal); box-shadow: 0 0 8px var(--teal);
+}
+
+/* MAIN GRID */
+.main {
+  display: grid; grid-template-columns: 1fr 320px;
+  gap: 1.5rem; padding: 1.5rem 2rem 3rem;
+  max-width: 1280px; margin: 0 auto;
+}
+@media(max-width: 900px){ .main { grid-template-columns: 1fr; } }
+@media(max-width: 600px){ header, .stats-bar, .main, .progress-wrap { padding-left: 1rem; padding-right: 1rem; } }
+
+.section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+  color: var(--text); display: flex; align-items: center; gap: 0.5rem;
+}
+.section-title::before { content: ''; display: block; width: 4px; height: 16px; background: linear-gradient(180deg, var(--accent), var(--teal)); border-radius: 99px; }
+
+/* NOW BANNER */
+.now-banner {
+  background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.04));
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: var(--r); padding: 0.85rem 1.1rem;
+  display: none; align-items: center; gap: 0.8rem;
+  margin-bottom: 1rem; animation: fadeIn 0.3s;
+}
+.now-banner.visible { display: flex; }
+.now-pulse { width: 8px; height: 8px; background: var(--amber); border-radius: 50%; flex-shrink: 0; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0)} }
+.now-text { font-size: 0.83rem; color: var(--text2); }
+.now-text strong { color: var(--amber); }
+
+/* SCHEDULE */
+.schedule-list { display: flex; flex-direction: column; gap: 0.55rem; }
+.task-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 0.8rem 1rem;
+  display: flex; align-items: center; gap: 0.9rem;
+  cursor: pointer; transition: all 0.2s;
+  position: relative; overflow: hidden;
+  animation: fadeIn 0.35s both;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+.task-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--border2); border-radius: 3px 0 0 3px; transition: all 0.2s;
+}
+.task-item:hover { border-color: var(--border2); background: var(--card2); transform: translateX(2px); }
+.task-item:hover::before { background: var(--accent); }
+.task-item.active { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.04); }
+.task-item.active::before { background: var(--amber); }
+.task-item.done { background: var(--done-bg); border-color: rgba(20,184,166,0.3); opacity: 0.8; }
+.task-item.done::before { background: var(--teal); }
+.task-check {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s; font-size: 0.7rem;
+}
+.task-item.done .task-check { background: var(--teal); border-color: var(--teal); color: #fff; }
+.task-item.active .task-check { border-color: var(--amber); animation: pulse 1.5s infinite; }
+.task-time { font-size: 0.7rem; color: var(--text3); font-weight: 600; min-width: 85px; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+.task-item.active .task-time { color: var(--amber); }
+.task-item.done .task-time  { color: var(--teal); }
+.task-info { flex: 1; min-width: 0; }
+.task-name { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.task-item.done .task-name { text-decoration: line-through; color: var(--text3); }
+.task-sub  { font-size: 0.72rem; color: var(--text3); margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.task-actions { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; opacity: 0; transition: opacity 0.2s; }
+.task-item:hover .task-actions { opacity: 1; }
+.task-actions.always { opacity: 1; }
+.act-btn {
+  width: 26px; height: 26px; border-radius: 0.5rem; border: 1px solid var(--border2);
+  background: var(--surface); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--text2);
+}
+.act-btn.edit:hover { border-color: var(--accent); color: var(--accent); background: rgba(59,130,246,0.1); }
+.act-btn.del:hover  { border-color: var(--rose); color: var(--rose); background: rgba(244,63,94,0.1); }
+.cat-badge {
+  font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 0.18rem 0.55rem; border-radius: 99px; flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+}
+.cat-prayer  { background: rgba(245,158,11,0.15); color: var(--amber); }
+.cat-study   { background: rgba(59,130,246,0.15);  color: var(--accent); }
+.cat-health  { background: rgba(244,63,94,0.15);   color: var(--rose); }
+.cat-home    { background: rgba(20,184,166,0.15);  color: var(--teal); }
+.cat-tuition { background: rgba(139,92,246,0.15);  color: var(--violet); }
+.cat-work    { background: rgba(234,179,8,0.15);   color: #eab308; }
+.cat-break   { background: rgba(100,116,139,0.15); color: #64748b; }
+.cat-other   { background: rgba(148,163,184,0.1);  color: var(--text2); }
+
+.empty-state {
+  text-align: center; padding: 3rem 1rem; color: var(--text3);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text2); margin-bottom: 0.4rem; }
+.empty-sub { font-size: 0.83rem; line-height: 1.6; }
+.empty-cta {
+  margin-top: 1.2rem; display: inline-flex; align-items: center; gap: 0.4rem;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  color: #fff; border: none; border-radius: var(--r); padding: 0.65rem 1.3rem;
+  font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+}
+.empty-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(59,130,246,0.4); }
+
+/* SIDEBAR */
+.sidebar { display: flex; flex-direction: column; gap: 1.2rem; }
+.side-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 1.1rem;
+}
+.mini-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+.cal-nav {
+  background: none; border: 1px solid var(--border); color: var(--text2);
+  border-radius: 0.4rem; padding: 0.2rem 0.55rem; cursor: pointer; font-size: 0.8rem;
+  transition: all 0.15s;
+}
+.cal-nav:hover { border-color: var(--accent); color: var(--accent); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; text-align: center; }
+.cal-day-label { font-size: 0.6rem; color: var(--text3); padding: 0.25rem 0; font-family: 'DM Mono', monospace; font-weight: 600; }
+.cal-day { font-size: 0.75rem; padding: 0.3rem; border-radius: 0.35rem; cursor: pointer; transition: background 0.15s; color: var(--text3); }
+.cal-day:hover { background: var(--border); color: var(--text); }
+.cal-day.today { background: var(--accent); color: #fff; font-weight: 700; }
+.cal-day.has-entry { color: var(--text); position: relative; }
+.cal-day.has-entry::after { content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:3px; height:3px; border-radius:50%; background:var(--teal); }
+.cal-day.empty { visibility: hidden; }
+
+/* LOG */
+.log-scroll { max-height: 260px; overflow-y: auto; }
+.log-scroll::-webkit-scrollbar { width: 3px; }
+.log-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+.log-entry {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+  font-size: 0.78rem; animation: fadeIn 0.25s;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-icon { font-size: 0.95rem; flex-shrink: 0; margin-top: 1px; }
+.log-name { font-weight: 700; color: var(--text); }
+.log-stamp { color: var(--text3); font-size: 0.68rem; font-family: 'DM Mono', monospace; }
+.log-empty { text-align: center; color: var(--text3); font-size: 0.8rem; padding: 0.8rem 0; }
+
+.reset-btn {
+  width: 100%; background: none; border: 1px solid var(--border2);
+  color: var(--text3); border-radius: var(--r); padding: 0.6rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+}
+.reset-btn:hover { border-color: var(--rose); color: var(--rose); }
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL (Add / Edit Task)
+═══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 200;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 1.5rem; padding: 2rem; width: 100%; max-width: 520px;
+  margin: 1rem; animation: modalIn 0.3s cubic-bezier(.22,1,.36,1);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.93) translateY(24px)} to{opacity:1;transform:none} }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 800; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 0.5rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--text2); cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.modal-close:hover { border-color: var(--rose); color: var(--rose); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.form-select {
+  width: 100%; padding: 0.75rem 1rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; outline: none; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+.form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.form-textarea {
+  width: 100%; padding: 0.75rem 1rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text); font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; outline: none; resize: vertical; min-height: 70px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.form-textarea::placeholder { color: var(--text3); }
+.modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+.btn-save {
+  flex: 1; padding: 0.8rem;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  border: none; border-radius: var(--r); color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+}
+.btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(59,130,246,0.4); }
+.btn-cancel {
+  background: none; border: 1px solid var(--border2); color: var(--text2);
+  border-radius: var(--r); padding: 0.8rem 1.2rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--text); color: var(--text); }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  background: var(--card2); border: 1px solid var(--teal);
+  border-radius: var(--r); padding: 0.8rem 1.1rem; font-size: 0.83rem;
+  z-index: 999; transform: translateY(120%); transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+  display: flex; align-items: center; gap: 0.55rem; max-width: 280px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+#toast.show { transform: translateY(0); }
+#toast .t-icon { font-size: 1rem; }
+
+/* User list delete */
+.user-chip-del {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.75rem;
+}
+.chip-del-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 0.75rem; padding: 0; line-height: 1;
+  transition: color 0.15s;
+}
+.chip-del-btn:hover { color: var(--rose); }
+
+/* AM/PM TOGGLE */
+.ampm-toggle {
+  display: flex; background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); overflow: hidden; flex-shrink: 0;
+}
+.ampm-btn {
+  flex: 1; padding: 0.75rem 1rem; border: none; background: none;
+  color: var(--text3); font-family: 'DM Mono', monospace; font-size: 0.8rem;
+  font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em;
+}
+.ampm-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.4);
+}
+.time-input-wrap { display: flex; gap: 0.5rem; align-items: center; }
+.time-input-wrap .form-input { flex: 1; }
+
+/* NOTIFICATION SETTINGS CARD */
+.notif-settings-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r2); padding: 1.1rem;
+}
+.notif-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+  gap: 0.8rem;
+}
+.notif-row:last-child { border-bottom: none; padding-bottom: 0; }
+.notif-row:first-child { padding-top: 0; }
+.notif-label { font-size: 0.82rem; color: var(--text2); font-weight: 600; }
+.notif-sub { font-size: 0.7rem; color: var(--text3); margin-top: 0.1rem; }
+.toggle-switch {
+  position: relative; width: 40px; height: 22px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0; background: var(--border2);
+  border-radius: 99px; cursor: pointer; transition: background 0.3s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 16px; height: 16px; background: #fff; border-radius: 50%;
+  transition: transform 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--teal); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+/* WHATSAPP SETUP */
+.wa-setup {
+  margin-top: 0.8rem; padding: 0.8rem;
+  background: rgba(20,184,166,0.06); border: 1px solid rgba(20,184,166,0.2);
+  border-radius: var(--r); display: none;
+}
+.wa-setup.visible { display: block; }
+.wa-setup .form-label { color: var(--teal); }
+.wa-input-row { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+.wa-save-btn {
+  padding: 0.6rem 1rem; background: #25D366;
+  border: none; border-radius: var(--r); color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+}
+.wa-save-btn:hover { background: #128C7E; transform: translateY(-1px); }
+.wa-test-btn {
+  width: 100%; padding: 0.55rem; margin-top: 0.6rem;
+  background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.3);
+  color: #25D366; border-radius: var(--r);
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.wa-test-btn:hover { background: rgba(37,211,102,0.2); }
+.wa-hint { font-size: 0.68rem; color: var(--text3); margin-top: 0.5rem; line-height: 1.5; }
+
+/* NOTIFICATION ALERT BANNER */
+.alert-banner {
+  position: fixed; top: 1rem; right: 1rem; left: 1rem;
+  max-width: 420px; margin: 0 auto;
+  background: var(--card2); border: 1px solid var(--teal);
+  border-radius: var(--r2); padding: 1rem 1.2rem;
+  z-index: 1000; display: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(20,184,166,0.2);
+  animation: slideDown 0.4s cubic-bezier(.22,1,.36,1);
+}
+@keyframes slideDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:none} }
+.alert-banner.show { display: block; }
+.alert-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.alert-title { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 800; color: var(--teal); display: flex; align-items: center; gap: 0.5rem; }
+.alert-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 1rem; }
+.alert-body { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+.alert-task { font-weight: 700; color: var(--text); }
+.alert-wa-btn {
+  margin-top: 0.7rem; padding: 0.5rem 1rem;
+  background: #25D366; border: none; border-radius: var(--r);
+  color: #fff; font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;
+}
+.alert-wa-btn:hover { background: #128C7E; }
+
+/* Notif dot on header */
+.notif-dot {
+  width: 8px; height: 8px; background: var(--teal); border-radius: 50%;
+  animation: pulse 1.5s infinite; display: none;
+}
+.notif-dot.active { display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ ONBOARD SCREEN ═══════════════════════ -->
+<div id="onboard-screen">
+  <div class="onboard-card">
+    <div class="brand-logo">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-name">RoutineOS</div>
+        <div class="brand-tag">// YOUR DAILY COMMAND CENTER</div>
+      </div>
+    </div>
+    <h1 class="onboard-title">Build habits.<br><span>Own your day.</span></h1>
+    <p class="onboard-sub">Create a personal routine, track tasks, and stay consistent — every single day.</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+    </div>
+
+    <!-- Login form -->
+    <div id="form-login">
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" id="login-name" type="text" placeholder="Enter your name…" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-pass" type="password" placeholder="Enter password…">
+        <div class="form-error" id="login-error">Invalid name or password.</div>
+      </div>
+      <button class="btn-full" onclick="doLogin()">Enter My Dashboard →</button>
+      <div class="existing-users" id="existing-users-wrap" style="display:none">
+        <div class="eu-label">Quick Select</div>
+        <div class="user-chips" id="existing-chips"></div>
+      </div>
+    </div>
+
+    <!-- Register form -->
+    <div id="form-register" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" id="reg-name" type="text" placeholder="What should we call you?" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Create Password</label>
+        <input class="form-input" id="reg-pass" type="password" placeholder="Set a password…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input class="form-input" id="reg-pass2" type="password" placeholder="Repeat password…">
+        <div class="form-error" id="reg-error">Passwords don't match or name already taken.</div>
+      </div>
+      <button class="btn-full" onclick="doRegister()">Create My Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ APP SCREEN ═══════════════════════ -->
+<div id="app-screen">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="header-brand">⚡ RoutineOS</div>
+      <div class="user-greeting">
+        <div class="user-avatar" id="user-avatar"></div>
+        <span id="user-greeting-name"></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="date-badge" id="header-date"></div>
+      <button class="hdr-btn add" onclick="openAddModal()">＋ Add Task</button>
+      <button class="hdr-btn report" onclick="openNotifSettings()" style="position:relative">
+        🔔 Alerts <span class="notif-dot" id="notif-dot"></span>
+      </button>
+      <button class="hdr-btn report" onclick="downloadReport()">↓ Report</button>
+      <button class="hdr-btn logout" onclick="doLogout()">← Logout</button>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Total Tasks</div>
+      <div class="stat-val sv-blue" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-val sv-teal" id="stat-done">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Remaining</div>
+      <div class="stat-val sv-amber" id="stat-left">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Score</div>
+      <div class="stat-val sv-rose" id="stat-pct">0%</div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span id="prog-label">0 / 0 tasks</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill"></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div>
+      <!-- Now banner -->
+      <div class="now-banner" id="now-banner">
+        <div class="now-pulse"></div>
+        <div class="now-text">Now: <strong id="now-task-name"></strong></div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="section-head">
+        <div class="section-title">Today's Routine</div>
+        <span style="font-size:0.75rem;color:var(--text3);font-family:'DM Mono',monospace;" id="routine-day"></span>
+      </div>
+      <div class="schedule-list" id="schedule-list"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- Mini Calendar -->
+      <div class="side-card">
+        <div class="mini-cal-header">
+          <div class="section-title" style="margin-bottom:0">Calendar</div>
+          <div style="display:flex;gap:0.4rem">
+            <button class="cal-nav" id="cal-prev">‹</button>
+            <span id="cal-title" style="font-size:0.8rem;color:var(--text2);display:flex;align-items:center;font-family:'DM Mono',monospace"></span>
+            <button class="cal-nav" id="cal-next">›</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+
+      <!-- Completion Log -->
+      <div class="side-card">
+        <div class="section-head" style="margin-bottom:0.8rem">
+          <div class="section-title">Activity Log</div>
+        </div>
+        <div class="log-scroll">
+          <div id="log-list"></div>
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <button class="reset-btn" onclick="resetDay()">↺ Reset Today's Progress</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ ADD/EDIT MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add New Task</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Task Name *</label>
+      <input class="form-input" id="m-name" type="text" placeholder="e.g. Morning Run, Read Chapter 3…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Note</label>
+      <textarea class="form-textarea" id="m-sub" placeholder="Short details about this task…"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Start Time</label>
+        <div class="time-input-wrap">
+          <input class="form-input" id="m-start" type="time">
+          <div class="ampm-toggle">
+            <button class="ampm-btn active" id="start-am" onclick="setAMPM('start','AM')">AM</button>
+            <button class="ampm-btn" id="start-pm" onclick="setAMPM('start','PM')">PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">End Time</label>
+        <div class="time-input-wrap">
+          <input class="form-input" id="m-end" type="time">
+          <div class="ampm-toggle">
+            <button class="ampm-btn active" id="end-am" onclick="setAMPM('end','AM')">AM</button>
+            <button class="ampm-btn" id="end-pm" onclick="setAMPM('end','PM')">PM</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:0.8rem">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="m-cat">
+        <option value="study">📚 Study</option>
+        <option value="health">💪 Health</option>
+        <option value="prayer">🕌 Prayer</option>
+        <option value="home">🏠 Home</option>
+        <option value="work">💼 Work</option>
+        <option value="tuition">🎓 Tuition</option>
+        <option value="break">☕ Break</option>
+        <option value="other">✦ Other</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveTask()">Save Task</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ NOTIFICATION SETTINGS MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="notif-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">🔔 Alerts & Notifications</div>
+      <button class="modal-close" onclick="closeNotifSettings()">✕</button>
+    </div>
+
+    <div class="notif-settings-card" style="border:none;padding:0">
+      <!-- Browser Notifications -->
+      <div class="notif-row">
+        <div>
+          <div class="notif-label">🔔 Browser Notifications</div>
+          <div class="notif-sub">Pop-up alerts when a routine starts or ends</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-browser" onchange="toggleBrowserNotif(this)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- Sound Alert -->
+      <div class="notif-row">
+        <div>
+          <div class="notif-label">🔊 Sound Alert</div>
+          <div class="notif-sub">Play a chime when routine starts/ends</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-sound" onchange="saveNotifSettings()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- In-app Banner -->
+      <div class="notif-row">
+        <div>
+          <div class="notif-label">📣 In-App Banner</div>
+          <div class="notif-sub">Show banner inside the app on the screen</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-banner" checked onchange="saveNotifSettings()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="notif-row" style="flex-direction:column;align-items:flex-start;gap:0.3rem">
+        <div style="display:flex;width:100%;justify-content:space-between;align-items:center">
+          <div>
+            <div class="notif-label" style="display:flex;align-items:center;gap:0.4rem">
+              <span style="font-size:1rem">💬</span> WhatsApp Alerts
+            </div>
+            <div class="notif-sub">Send yourself a WhatsApp message as a reminder</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-whatsapp" onchange="toggleWhatsapp(this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="wa-setup" id="wa-setup">
+          <div class="form-label" style="color:var(--teal);font-size:0.7rem">YOUR WHATSAPP NUMBER</div>
+          <div class="wa-input-row">
+            <input class="form-input" id="wa-number" type="tel" placeholder="+91 98765 43210" style="font-size:0.85rem">
+            <button class="wa-save-btn" onclick="saveWaNumber()">💾 Save</button>
+          </div>
+          <button class="wa-test-btn" onclick="sendWaTest()">📲 Send Test Message</button>
+          <div class="wa-hint">
+            ℹ️ This opens WhatsApp with a pre-filled message. You just tap <strong>Send</strong>.<br>
+            Works on mobile (app) and desktop (WhatsApp Web). No API key needed.
+          </div>
+        </div>
+      </div>
+
+      <!-- Remind before -->
+      <div class="notif-row">
+        <div>
+          <div class="notif-label">⏱ Remind Before Start</div>
+          <div class="notif-sub">Alert you N minutes before routine starts</div>
+        </div>
+        <select class="form-select" id="remind-before" onchange="saveNotifSettings()" style="width:90px;padding:0.4rem 0.6rem;font-size:0.8rem">
+          <option value="0">Off</option>
+          <option value="2">2 min</option>
+          <option value="5" selected>5 min</option>
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-top:1.2rem;padding:0.8rem;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:var(--r);font-size:0.75rem;color:var(--text3);line-height:1.6">
+      💡 <strong style="color:var(--text2)">How it works:</strong> RoutineOS checks your schedule every minute. When a task is about to start or has just ended, you'll be notified via your selected channels.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-save" onclick="closeNotifSettings()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT BANNER -->
+<div class="alert-banner" id="alert-banner">
+  <div class="alert-header">
+    <div class="alert-title" id="alert-title">⏰ Routine Alert</div>
+    <button class="alert-close" onclick="closeAlertBanner()">✕</button>
+  </div>
+  <div class="alert-body" id="alert-body"></div>
+  <button class="alert-wa-btn" id="alert-wa-btn" onclick="sendCurrentAlertToWA()" style="display:none">
+    <span>💬</span> Send to WhatsApp
+  </button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><span class="t-icon">✓</span><span id="toast-msg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STORAGE HELPERS
+// ═══════════════════════════════════════════════════════════════
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  del: k => localStorage.removeItem(k)
+};
+
+const CAT_ICONS = {
+  prayer:'🕌', study:'📚', health:'💪', home:'🏠',
+  tuition:'🎓', work:'💼', break:'☕', other:'✦'
+};
+const CAT_LABELS = {
+  prayer:'Prayer', study:'Study', health:'Health', home:'Home',
+  tuition:'Tuition', work:'Work', break:'Break', other:'Other'
+};
+
+// ═══════════════════════════════════════════════════════════════
+// USER MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function getUsers() { return LS.get('routineos_users') || {}; }
+function saveUsers(u) { LS.set('routineos_users', u); }
+let currentUser = null;
+
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+}
+
+function renderExistingUsers() {
+  const users = getUsers();
+  const names = Object.keys(users);
+  const wrap = document.getElementById('existing-users-wrap');
+  const chips = document.getElementById('existing-chips');
+  if (!names.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  chips.innerHTML = names.map(n => `
+    <div class="user-chip user-chip-del">
+      <span onclick="quickSelect('${n.replace(/'/g,"\\'")}')">👤 ${n}</span>
+      <button class="chip-del-btn" title="Delete account" onclick="deleteUser('${n.replace(/'/g,"\\'")}')">✕</button>
+    </div>`).join('');
+}
+
+function quickSelect(name) {
+  document.getElementById('login-name').value = name;
+  document.getElementById('login-pass').focus();
+}
+
+function deleteUser(name) {
+  if (!confirm(`Delete "${name}" and all their data? This cannot be undone.`)) return;
+  const users = getUsers();
+  delete users[name];
+  saveUsers(users);
+  // delete all routine data
+  const keys = Object.keys(localStorage).filter(k => k.startsWith(`routineos_${name}_`));
+  keys.forEach(k => localStorage.removeItem(k));
+  renderExistingUsers();
+  showToast(`Account "${name}" deleted.`);
+}
+
+function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  const users = getUsers();
+  if (!name || !users[name] || users[name].pass !== btoa(pass)) {
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+  currentUser = name;
+  enterApp();
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const err = document.getElementById('reg-error');
+  const users = getUsers();
+  if (!name || pass !== pass2 || pass.length < 1 || users[name]) {
+    err.textContent = users[name] ? 'Name already taken.' : "Passwords don't match or name is empty.";
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+  users[name] = { pass: btoa(pass), created: Date.now() };
+  saveUsers(users);
+  currentUser = name;
+  enterApp();
+  showToast(`Welcome aboard, ${name}! 🎉`);
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('onboard-screen').style.display = '';
+  renderExistingUsers();
+  document.getElementById('login-name').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════════════════════════
+function enterApp() {
+  document.getElementById('onboard-screen').style.display = 'none';
+  document.getElementById('app-screen').classList.add('active');
+  document.getElementById('user-greeting-name').textContent = currentUser;
+  document.getElementById('user-avatar').textContent = currentUser.charAt(0).toUpperCase();
+  document.getElementById('header-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('routine-day').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long'});
+  state = loadState(); log = loadLog();
+  renderSchedule(); renderLog(); renderCalendar();
+  setInterval(() => { renderSchedule(); }, 60000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PER-USER KEYS
+// ═══════════════════════════════════════════════════════════════
+function userKey(suffix) { return `routineos_${currentUser}_${suffix}`; }
+function dateKey(d) { return `${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`; }
+function todayKey() { return dateKey(new Date()); }
+function loadSchedule() { return LS.get(userKey('schedule')) || []; }
+function saveSchedule(s) { LS.set(userKey('schedule'), s); }
+function loadState() { return LS.get(userKey('state_' + todayKey())) || {}; }
+function saveState(s) { LS.set(userKey('state_' + todayKey()), s); }
+function loadLog() { return LS.get(userKey('log_' + todayKey())) || []; }
+function saveLog(l) { LS.set(userKey('log_' + todayKey()), l); }
+
+let SCHEDULE = [], state = {}, log = [];
+
+// ═══════════════════════════════════════════════════════════════
+// TIME UTILS
+// ═══════════════════════════════════════════════════════════════
+function toMin(t) { const [h,m] = t.split(':').map(Number); return h*60+(m||0); }
+function nowMin() { const n = new Date(); return n.getHours()*60 + n.getMinutes(); }
+function fmtTime(t) { if (!t) return ''; const [h,m] = t.split(':'); const hr = +h; return `${hr > 12 ? hr-12 : hr || 12}:${m} ${hr >= 12 ? 'PM' : 'AM'}`; }
+function currentTaskId() {
+  const now = nowMin(), s = SCHEDULE;
+  for (let i = 0; i < s.length - 1; i++) {
+    if (now >= toMin(s[i].start) && now < toMin(s[i+1].start)) return s[i].id;
+  }
+  const last = s[s.length-1];
+  if (last && now >= toMin(last.start)) return last.id;
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER SCHEDULE
+// ═══════════════════════════════════════════════════════════════
+function renderSchedule() {
+  SCHEDULE = loadSchedule().sort((a,b) => toMin(a.start) - toMin(b.start));
+  const list = document.getElementById('schedule-list');
+  list.innerHTML = '';
+
+  if (!SCHEDULE.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">No tasks yet</div>
+        <div class="empty-sub">Start building your daily routine by adding tasks. Each task will be tracked and saved for you.</div>
+        <button class="empty-cta" onclick="openAddModal()">＋ Add Your First Task</button>
+      </div>`;
+    updateStats(); updateProgress(); return;
+  }
+
+  const activeId = currentTaskId();
+  SCHEDULE.forEach((t, i) => {
+    const isDone = !!state[t.id], isActive = t.id === activeId && !isDone;
+    const div = document.createElement('div');
+    div.className = 'task-item' + (isDone ? ' done' : '') + (isActive ? ' active' : '');
+    div.style.animationDelay = (i * 0.03) + 's';
+    div.innerHTML = `
+      <div class="task-check">${isDone ? '✓' : (isActive ? '▶' : '')}</div>
+      <div class="task-time">${fmtTime(t.start)}${t.end ? ' – ' + fmtTime(t.end) : ''}</div>
+      <div class="task-info">
+        <div class="task-name">${CAT_ICONS[t.cat] || '✦'} ${t.name}</div>
+        ${t.sub ? `<div class="task-sub">${t.sub}</div>` : ''}
+      </div>
+      <span class="cat-badge cat-${t.cat}">${CAT_LABELS[t.cat] || t.cat}</span>
+      <div class="task-actions">
+        <button class="act-btn edit" title="Edit" onclick="event.stopPropagation();openEditModal(${t.id})">✎</button>
+        <button class="act-btn del" title="Delete" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
+      </div>`;
+    div.addEventListener('click', () => toggleTask(t));
+    list.appendChild(div);
+  });
+
+  const nowTask = SCHEDULE.find(t => t.id === activeId);
+  const banner = document.getElementById('now-banner');
+  if (nowTask && !state[nowTask.id]) {
+    banner.classList.add('visible');
+    document.getElementById('now-task-name').textContent = nowTask.name;
+  } else { banner.classList.remove('visible'); }
+
+  updateStats(); updateProgress();
+}
+
+function toggleTask(t) {
+  if (state[t.id]) {
+    delete state[t.id];
+    log = log.filter(e => e.id !== t.id);
+  } else {
+    state[t.id] = Date.now();
+    const now = new Date();
+    log.unshift({ id: t.id, name: t.name, cat: t.cat, stamp: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+    showToast(`"${t.name}" marked complete! 🎉`);
+  }
+  saveState(state); saveLog(log); renderSchedule(); renderLog();
+}
+
+function updateStats() {
+  const total = SCHEDULE.length, done = Object.keys(state).length;
+  const left = total - done, pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-left').textContent = left;
+  document.getElementById('stat-pct').textContent = pct + '%';
+}
+function updateProgress() {
+  const total = SCHEDULE.length, done = Object.keys(state).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${done} / ${total} tasks`;
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+function renderLog() {
+  const c = document.getElementById('log-list');
+  if (!log.length) { c.innerHTML = '<div class="log-empty">No tasks completed yet today.</div>'; return; }
+  c.innerHTML = log.map(e => `
+    <div class="log-entry">
+      <span class="log-icon">${CAT_ICONS[e.cat] || '✦'}</span>
+      <div>
+        <div class="log-name">${e.name}</div>
+        <div class="log-stamp">✓ Completed at ${e.stamp}</div>
+      </div>
+    </div>`).join('');
+}
+
+function resetDay() {
+  if (!confirm('Reset all progress for today?')) return;
+  state = {}; log = [];
+  saveState(state); saveLog(log);
+  renderSchedule(); renderLog();
+  showToast('Progress reset for today.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD / EDIT / DELETE TASKS
+// ═══════════════════════════════════════════════════════════════
+let editingId = null;
+
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add New Task';
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-sub').value = '';
+  document.getElementById('m-start').value = '';
+  document.getElementById('m-end').value = '';
+  document.getElementById('m-cat').value = 'study';
+  document.getElementById('task-modal').classList.add('open');
+  setTimeout(() => document.getElementById('m-name').focus(), 100);
+}
+
+function openEditModal(id) {
+  const t = SCHEDULE.find(x => x.id === id);
+  if (!t) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Task';
+  document.getElementById('m-name').value = t.name;
+  document.getElementById('m-sub').value = t.sub || '';
+  document.getElementById('m-start').value = t.start || '';
+  document.getElementById('m-end').value = t.end || '';
+  document.getElementById('m-cat').value = t.cat || 'other';
+  document.getElementById('task-modal').classList.add('open');
+  setTimeout(() => document.getElementById('m-name').focus(), 100);
+}
+
+function closeModal() { document.getElementById('task-modal').classList.remove('open'); }
+
+function saveTask() {
+  const name = document.getElementById('m-name').value.trim();
+  if (!name) { document.getElementById('m-name').focus(); return; }
+  const start = document.getElementById('m-start').value;
+  const end = document.getElementById('m-end').value;
+  const cat = document.getElementById('m-cat').value;
+  const sub = document.getElementById('m-sub').value.trim();
+  let schedule = loadSchedule();
+
+  if (editingId !== null) {
+    const idx = schedule.findIndex(t => t.id === editingId);
+    if (idx !== -1) schedule[idx] = { ...schedule[idx], name, sub, start, end, cat };
+    showToast('Task updated!');
+  } else {
+    const newId = Date.now();
+    schedule.push({ id: newId, name, sub, start, end, cat });
+    showToast(`"${name}" added to your routine!`);
+  }
+
+  saveSchedule(schedule);
+  closeModal();
+  renderSchedule();
+}
+
+function deleteTask(id) {
+  const t = SCHEDULE.find(x => x.id === id);
+  if (!t || !confirm(`Delete "${t.name}"?`)) return;
+  let schedule = loadSchedule().filter(x => x.id !== id);
+  if (state[id]) { delete state[id]; saveState(state); }
+  log = log.filter(e => e.id !== id); saveLog(log);
+  saveSchedule(schedule);
+  renderSchedule(); renderLog();
+  showToast(`"${t.name}" removed.`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MINI CALENDAR
+// ═══════════════════════════════════════════════════════════════
+let calDate = new Date();
+function renderCalendar() {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('cal-title').textContent = calDate.toLocaleString('default', {month:'short', year:'numeric'});
+  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const first = new Date(y,m,1).getDay(), total = new Date(y,m+1,0).getDate(), today = new Date();
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
+  for (let d = 1; d <= total; d++) {
+    const key = userKey(`state_${y}_${m}_${d}`);
+    const stored = LS.get(key) || {};
+    const has = Object.keys(stored).length > 0;
+    const isToday = y===today.getFullYear() && m===today.getMonth() && d===today.getDate();
+    grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${has&&!isToday?'has-entry':''}">${d}</div>`;
+  }
+}
+document.getElementById('cal-prev').addEventListener('click', () => { calDate.setMonth(calDate.getMonth()-1); renderCalendar(); });
+document.getElementById('cal-next').addEventListener('click', () => { calDate.setMonth(calDate.getMonth()+1); renderCalendar(); });
+
+// ═══════════════════════════════════════════════════════════════
+// DOWNLOAD REPORT
+// ═══════════════════════════════════════════════════════════════
+function downloadReport() {
+  const today = new Date();
+  const schedule = loadSchedule().sort((a,b) => toMin(a.start) - toMin(b.start));
+  const done = Object.keys(state).length, total = schedule.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  const completedTasks = schedule.filter(t => !!state[t.id]);
+  const missedTasks = schedule.filter(t => !state[t.id]);
+
+  let txt = `====================================================\n`;
+  txt += `     ROUTINE REPORT — ${currentUser.toUpperCase()}\n`;
+  txt += `====================================================\n`;
+  txt += `Date: ${today.toLocaleDateString('en-IN', {weekday:'long',day:'numeric',month:'long',year:'numeric'})}\n`;
+  txt += `Score: ${done}/${total} tasks completed (${pct}%)\n\n`;
+  txt += `✅ COMPLETED TASKS:\n`;
+  completedTasks.forEach(t => { txt += `   • [${fmtTime(t.start)}${t.end?' – '+fmtTime(t.end):''}] ${CAT_ICONS[t.cat]} ${t.name}\n`; });
+  if (missedTasks.length) {
+    txt += `\n❌ PENDING / MISSED:\n`;
+    missedTasks.forEach(t => { txt += `   • [${fmtTime(t.start)}${t.end?' – '+fmtTime(t.end):''}] ${t.name}\n`; });
+  }
+  txt += `\n====================================================\n`;
+  txt += `Generated by RoutineOS\n====================================================\n`;
+
+  const blob = new Blob([txt], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `routine_${currentUser}_${today.toISOString().slice(0,10)}.txt`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('Report downloaded!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, icon = '✓') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.querySelector('.t-icon').textContent = icon;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Close modal on overlay click
+document.getElementById('task-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('form-login').style.display !== 'none' &&
+        document.getElementById('onboard-screen').style.display !== 'none') doLogin();
+    if (document.getElementById('form-register').style.display !== 'none' &&
+        document.getElementById('onboard-screen').style.display !== 'none') doRegister();
+  }
+  if (e.key === 'Escape') closeModal();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// AM/PM TOGGLE LOGIC
+// ═══════════════════════════════════════════════════════════════
+function setAMPM(field, period) {
+  const input = document.getElementById(`m-${field}`);
+  const amBtn = document.getElementById(`${field}-am`);
+  const pmBtn = document.getElementById(`${field}-pm`);
+  amBtn.classList.toggle('active', period === 'AM');
+  pmBtn.classList.toggle('active', period === 'PM');
+
+  if (!input.value) return;
+  let [h, m] = input.value.split(':').map(Number);
+  if (period === 'AM') {
+    if (h === 12) h = 0;
+  } else {
+    if (h < 12) h += 12;
+  }
+  input.value = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+function syncAMPMButtons(field) {
+  const input = document.getElementById(`m-${field}`);
+  if (!input.value) return;
+  const h = parseInt(input.value.split(':')[0]);
+  const isPM = h >= 12;
+  document.getElementById(`${field}-am`).classList.toggle('active', !isPM);
+  document.getElementById(`${field}-pm`).classList.toggle('active', isPM);
+}
+
+// Sync AM/PM buttons when user types in time input
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('m-start').addEventListener('input', () => syncAMPMButtons('start'));
+  document.getElementById('m-end').addEventListener('input', () => syncAMPMButtons('end'));
+});
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATION SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function notifKey() { return currentUser ? `routineos_${currentUser}_notif` : 'routineos_notif'; }
+
+function loadNotifSettings() {
+  return LS.get(notifKey()) || {
+    browser: false, sound: true, banner: true,
+    whatsapp: false, waNumber: '', remindBefore: 5
+  };
+}
+
+function saveNotifSettings() {
+  const s = {
+    browser: document.getElementById('toggle-browser').checked,
+    sound: document.getElementById('toggle-sound').checked,
+    banner: document.getElementById('toggle-banner').checked,
+    whatsapp: document.getElementById('toggle-whatsapp').checked,
+    waNumber: document.getElementById('wa-number').value.trim(),
+    remindBefore: parseInt(document.getElementById('remind-before').value)
+  };
+  LS.set(notifKey(), s);
+  updateNotifDot(s);
+}
+
+function loadNotifUI() {
+  const s = loadNotifSettings();
+  document.getElementById('toggle-browser').checked = s.browser;
+  document.getElementById('toggle-sound').checked = s.sound;
+  document.getElementById('toggle-banner').checked = s.banner !== false;
+  document.getElementById('toggle-whatsapp').checked = s.whatsapp;
+  document.getElementById('wa-number').value = s.waNumber || '';
+  document.getElementById('remind-before').value = s.remindBefore ?? 5;
+  document.getElementById('wa-setup').classList.toggle('visible', s.whatsapp);
+  updateNotifDot(s);
+}
+
+function updateNotifDot(s) {
+  const anyOn = s.browser || s.sound || s.whatsapp || s.banner;
+  document.getElementById('notif-dot').classList.toggle('active', anyOn);
+}
+
+function openNotifSettings() {
+  loadNotifUI();
+  document.getElementById('notif-modal').classList.add('open');
+}
+
+function closeNotifSettings() {
+  saveNotifSettings();
+  document.getElementById('notif-modal').classList.remove('open');
+}
+
+function toggleBrowserNotif(el) {
+  if (el.checked) {
+    Notification.requestPermission().then(p => {
+      if (p !== 'granted') {
+        el.checked = false;
+        showToast('Browser notifications blocked. Please allow in browser settings.', '⚠️');
+      } else {
+        showToast('Browser notifications enabled! ✅');
+      }
+      saveNotifSettings();
+    });
+  } else {
+    saveNotifSettings();
+  }
+}
+
+function toggleWhatsapp(el) {
+  document.getElementById('wa-setup').classList.toggle('visible', el.checked);
+  saveNotifSettings();
+}
+
+function saveWaNumber() {
+  const num = document.getElementById('wa-number').value.trim();
+  if (!num) { showToast('Please enter a phone number.', '⚠️'); return; }
+  saveNotifSettings();
+  showToast('WhatsApp number saved! 💬');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WHATSAPP MESSAGE SENDER
+// ═══════════════════════════════════════════════════════════════
+function buildWANumber(raw) {
+  return raw.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
+}
+
+function openWhatsApp(number, message) {
+  const num = buildWANumber(number);
+  const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
+function sendWaTest() {
+  const s = loadNotifSettings();
+  if (!s.waNumber) { showToast('Please save your number first.', '⚠️'); return; }
+  const msg = `👋 Hello from RoutineOS!\n\nThis is a test notification. Your routine alerts are set up correctly ✅\n\n— RoutineOS`;
+  openWhatsApp(s.waNumber, msg);
+}
+
+let currentAlertMsg = '';
+function sendCurrentAlertToWA() {
+  const s = loadNotifSettings();
+  if (!s.waNumber) { showToast('Set your WhatsApp number in Alert Settings.', '⚠️'); return; }
+  openWhatsApp(s.waNumber, currentAlertMsg);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ALERT BANNER
+// ═══════════════════════════════════════════════════════════════
+function showAlertBanner(title, body, waMsg) {
+  currentAlertMsg = waMsg;
+  document.getElementById('alert-title').textContent = title;
+  document.getElementById('alert-body').innerHTML = body;
+  const waBtn = document.getElementById('alert-wa-btn');
+  const s = loadNotifSettings();
+  waBtn.style.display = s.whatsapp && s.waNumber ? 'flex' : 'none';
+  const banner = document.getElementById('alert-banner');
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 12000);
+}
+
+function closeAlertBanner() {
+  document.getElementById('alert-banner').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SOUND ALERT
+// ═══════════════════════════════════════════════════════════════
+function playChime(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const freqs = type === 'start' ? [523, 659, 784] : [784, 659, 523];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = f;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.5);
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.5);
+    });
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICATION TRIGGER ENGINE
+// ═══════════════════════════════════════════════════════════════
+const _firedAlerts = new Set();
+
+function checkAndFireAlerts() {
+  if (!currentUser) return;
+  const s = loadNotifSettings();
+  const now = nowMin();
+  const schedule = loadSchedule().sort((a,b) => toMin(a.start) - toMin(b.start));
+
+  schedule.forEach(task => {
+    const startMin = toMin(task.start);
+    const endMin = task.end ? toMin(task.end) : null;
+    const isDone = !!(loadState()[task.id]);
+
+    // Remind before start
+    if (s.remindBefore > 0) {
+      const alertKey = `remind_${task.id}_${startMin}`;
+      if (!_firedAlerts.has(alertKey) && now === startMin - s.remindBefore && !isDone) {
+        _firedAlerts.add(alertKey);
+        fireAlert('remind', task, s);
+      }
+    }
+
+    // On start
+    const startKey = `start_${task.id}_${startMin}`;
+    if (!_firedAlerts.has(startKey) && now === startMin && !isDone) {
+      _firedAlerts.add(startKey);
+      fireAlert('start', task, s);
+    }
+
+    // On end
+    if (endMin) {
+      const endKey = `end_${task.id}_${endMin}`;
+      if (!_firedAlerts.has(endKey) && now === endMin) {
+        _firedAlerts.add(endKey);
+        fireAlert('end', task, s);
+      }
+    }
+  });
+}
+
+function fireAlert(type, task, s) {
+  const icon = CAT_ICONS[task.cat] || '✦';
+  const startStr = fmtTime(task.start);
+  const endStr = task.end ? fmtTime(task.end) : '';
+
+  let title, body, waMsg;
+
+  if (type === 'remind') {
+    title = `⏰ Starting Soon`;
+    body = `<span class="alert-task">${icon} ${task.name}</span> starts in ${s.remindBefore} minutes (${startStr}).`;
+    waMsg = `⏰ RoutineOS Reminder\n\nYour routine "${task.name}" starts in ${s.remindBefore} minutes at ${startStr}!\n\nGet ready 🚀`;
+  } else if (type === 'start') {
+    title = `▶ Routine Started`;
+    body = `Time to begin: <span class="alert-task">${icon} ${task.name}</span>${endStr ? ` (until ${endStr})` : ''}.`;
+    waMsg = `▶ RoutineOS Alert\n\n"${task.name}" has just started!\n🕐 ${startStr}${endStr ? ` → ${endStr}` : ''}\n\nDon't miss it! 💪`;
+  } else {
+    title = `✅ Routine Ended`;
+    body = `<span class="alert-task">${icon} ${task.name}</span> has ended. Remember to mark it complete!`;
+    waMsg = `✅ RoutineOS Alert\n\n"${task.name}" has ended at ${endStr || startStr}.\n\nRemember to log your completion! ✓`;
+  }
+
+  // In-app banner
+  if (s.banner) showAlertBanner(title, body, waMsg);
+
+  // Sound
+  if (s.sound) playChime(type === 'end' ? 'end' : 'start');
+
+  // Browser notification
+  if (s.browser && Notification.permission === 'granted') {
+    new Notification(title, {
+      body: `${icon} ${task.name}${type === 'remind' ? ` starts in ${s.remindBefore} min` : ''}`,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="26" font-size="28">⚡</text></svg>',
+      tag: `routineos_${task.id}_${type}`
+    });
+  }
+
+  // Auto WhatsApp (only if enabled - opens WA)
+  if (s.whatsapp && s.waNumber) {
+    // Store pending WA message - user clicks button to send (avoid auto-popup spam)
+    // Show button in banner instead
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOOT & PATCHES
+// ═══════════════════════════════════════════════════════════════
+renderExistingUsers();
+
+// Patch openAddModal to reset AM/PM buttons
+(function() {
+  const orig = openAddModal;
+  window.openAddModal = function() {
+    orig();
+    document.getElementById('start-am').classList.add('active');
+    document.getElementById('start-pm').classList.remove('active');
+    document.getElementById('end-am').classList.add('active');
+    document.getElementById('end-pm').classList.remove('active');
+  };
+
+  const origEdit = openEditModal;
+  window.openEditModal = function(id) {
+    origEdit(id);
+    setTimeout(() => { syncAMPMButtons('start'); syncAMPMButtons('end'); }, 50);
+  };
+
+  const origEnter = enterApp;
+  window.enterApp = function() {
+    origEnter();
+    startAlertEngine();
+    updateNotifDot(loadNotifSettings());
+  };
+})();
+
+// Wire up AM/PM sync on time input change
+document.getElementById('m-start').addEventListener('change', () => syncAMPMButtons('start'));
+document.getElementById('m-end').addEventListener('change', () => syncAMPMButtons('end'));
+
+// Start alert engine aligned to the next minute boundary
+function startAlertEngine() {
+  checkAndFireAlerts();
+  const now = new Date();
+  const msToNext = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+  setTimeout(() => {
+    checkAndFireAlerts();
+    setInterval(checkAndFireAlerts, 60000);
+  }, msToNext);
+}
+
+</script>
+</body>
+</html>
