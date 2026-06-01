@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RoutineOS — Your Daily Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root {
   --bg: #05070f;
@@ -551,6 +552,39 @@ header {
 .wa-test-btn:hover { background: rgba(37,211,102,0.2); }
 .wa-hint { font-size: 0.68rem; color: var(--text3); margin-top: 0.5rem; line-height: 1.5; }
 
+/* EMAIL SETUP */
+.email-setup {
+  margin-top: 0.8rem; padding: 0.8rem;
+  background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2);
+  border-radius: var(--r); display: none;
+}
+.email-setup.visible { display: block; }
+.email-setup .form-label { color: var(--accent); }
+.email-input-row { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+.email-save-btn {
+  padding: 0.6rem 1rem; background: var(--accent);
+  border: none; border-radius: var(--r); color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+}
+.email-save-btn:hover { background: #2563eb; transform: translateY(-1px); }
+.email-test-btn {
+  width: 100%; padding: 0.55rem; margin-top: 0.6rem;
+  background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);
+  color: var(--accent); border-radius: var(--r);
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.email-test-btn:hover { background: rgba(59,130,246,0.2); }
+.email-setup-info {
+  margin-top: 0.8rem; padding: 0.7rem; 
+  background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--r); font-size: 0.7rem; color: var(--text3); line-height: 1.6;
+}
+.email-setup-info a { color: var(--amber); text-decoration: none; }
+.email-setup-info a:hover { text-decoration: underline; }
+.emailjs-fields { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.6rem; }
+
 /* NOTIFICATION ALERT BANNER */
 .alert-banner {
   position: fixed; top: 1rem; right: 1rem; left: 1rem;
@@ -868,7 +902,7 @@ header {
           </div>
           <button class="wa-test-btn" onclick="sendWaTest()">📲 Send Test Message</button>
           <div class="wa-hint">
-            ℹ️ This opens WhatsApp with a pre-filled message. You just tap <strong>Send</strong>.<br>
+            ℹ️ When alerts fire, WhatsApp will auto-open with the message pre-filled. Tap <strong>Send</strong> once to confirm.<br>
             Works on mobile (app) and desktop (WhatsApp Web). No API key needed.
           </div>
         </div>
@@ -887,6 +921,41 @@ header {
           <option value="10">10 min</option>
           <option value="15">15 min</option>
         </select>
+      </div>
+
+      <!-- Email Alerts -->
+      <div class="notif-row" style="flex-direction:column;align-items:flex-start;gap:0.3rem">
+        <div style="display:flex;width:100%;justify-content:space-between;align-items:center">
+          <div>
+            <div class="notif-label" style="display:flex;align-items:center;gap:0.4rem">
+              <span style="font-size:1rem">📧</span> Email Alerts
+            </div>
+            <div class="notif-sub">Auto-send yourself email reminders (no confirmation needed)</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-email" onchange="toggleEmail(this)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="email-setup" id="email-setup">
+          <div class="form-label" style="color:var(--accent);font-size:0.7rem">YOUR EMAIL ADDRESS</div>
+          <div class="email-input-row">
+            <input class="form-input" id="email-address" type="email" placeholder="you@example.com" style="font-size:0.85rem">
+            <button class="email-save-btn" onclick="saveEmailAddress()">💾 Save</button>
+          </div>
+          <div class="email-setup-info">
+            <strong style="color:var(--amber)">⚙️ Setup Required (one-time, free):</strong><br>
+            1. Sign up at <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> (free — 200 emails/month)<br>
+            2. Add an Email Service (e.g. Gmail), create a Template, and copy your <strong>Public Key</strong>, <strong>Service ID</strong> &amp; <strong>Template ID</strong> below.
+          </div>
+          <div class="emailjs-fields">
+            <input class="form-input" id="ejs-pubkey" type="text" placeholder="EmailJS Public Key" style="font-size:0.8rem">
+            <input class="form-input" id="ejs-service" type="text" placeholder="EmailJS Service ID (e.g. service_abc)" style="font-size:0.8rem">
+            <input class="form-input" id="ejs-template" type="text" placeholder="EmailJS Template ID (e.g. template_xyz)" style="font-size:0.8rem">
+            <button class="email-save-btn" style="width:100%" onclick="saveEmailJSConfig()">💾 Save EmailJS Config</button>
+          </div>
+          <button class="email-test-btn" onclick="sendEmailTest()">📨 Send Test Email</button>
+        </div>
       </div>
     </div>
 
@@ -1362,7 +1431,9 @@ function notifKey() { return currentUser ? `routineos_${currentUser}_notif` : 'r
 function loadNotifSettings() {
   return LS.get(notifKey()) || {
     browser: false, sound: true, banner: true,
-    whatsapp: false, waNumber: '', remindBefore: 5
+    whatsapp: false, waNumber: '',
+    email: false, emailAddress: '',
+    remindBefore: 5
   };
 }
 
@@ -1373,6 +1444,8 @@ function saveNotifSettings() {
     banner: document.getElementById('toggle-banner').checked,
     whatsapp: document.getElementById('toggle-whatsapp').checked,
     waNumber: document.getElementById('wa-number').value.trim(),
+    email: document.getElementById('toggle-email').checked,
+    emailAddress: document.getElementById('email-address').value.trim(),
     remindBefore: parseInt(document.getElementById('remind-before').value)
   };
   LS.set(notifKey(), s);
@@ -1388,11 +1461,20 @@ function loadNotifUI() {
   document.getElementById('wa-number').value = s.waNumber || '';
   document.getElementById('remind-before').value = s.remindBefore ?? 5;
   document.getElementById('wa-setup').classList.toggle('visible', s.whatsapp);
+  // Email
+  document.getElementById('toggle-email').checked = s.email || false;
+  document.getElementById('email-address').value = s.emailAddress || '';
+  document.getElementById('email-setup').classList.toggle('visible', s.email || false);
+  // Load EmailJS config if saved
+  const ejsCfg = LS.get('routineos_emailjs') || {};
+  document.getElementById('ejs-pubkey').value = ejsCfg.pubkey || '';
+  document.getElementById('ejs-service').value = ejsCfg.service || '';
+  document.getElementById('ejs-template').value = ejsCfg.template || '';
   updateNotifDot(s);
 }
 
 function updateNotifDot(s) {
-  const anyOn = s.browser || s.sound || s.whatsapp || s.banner;
+  const anyOn = s.browser || s.sound || s.whatsapp || s.banner || s.email;
   document.getElementById('notif-dot').classList.toggle('active', anyOn);
 }
 
@@ -1427,11 +1509,32 @@ function toggleWhatsapp(el) {
   saveNotifSettings();
 }
 
+function toggleEmail(el) {
+  document.getElementById('email-setup').classList.toggle('visible', el.checked);
+  saveNotifSettings();
+}
+
 function saveWaNumber() {
   const num = document.getElementById('wa-number').value.trim();
   if (!num) { showToast('Please enter a phone number.', '⚠️'); return; }
   saveNotifSettings();
   showToast('WhatsApp number saved! 💬');
+}
+
+function saveEmailAddress() {
+  const email = document.getElementById('email-address').value.trim();
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email.', '⚠️'); return; }
+  saveNotifSettings();
+  showToast('Email address saved! 📧');
+}
+
+function saveEmailJSConfig() {
+  const pubkey = document.getElementById('ejs-pubkey').value.trim();
+  const service = document.getElementById('ejs-service').value.trim();
+  const template = document.getElementById('ejs-template').value.trim();
+  if (!pubkey || !service || !template) { showToast('Please fill all three EmailJS fields.', '⚠️'); return; }
+  LS.set('routineos_emailjs', { pubkey, service, template });
+  showToast('EmailJS config saved! ✅');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1580,11 +1683,55 @@ function fireAlert(type, task, s) {
     });
   }
 
-  // Auto WhatsApp (only if enabled - opens WA)
+  // Auto WhatsApp — opens wa.me link automatically in new tab
   if (s.whatsapp && s.waNumber) {
-    // Store pending WA message - user clicks button to send (avoid auto-popup spam)
-    // Show button in banner instead
+    const num = buildWANumber(s.waNumber);
+    const url = `https://wa.me/${num}?text=${encodeURIComponent(waMsg)}`;
+    window.open(url, '_blank');
   }
+
+  // Auto Email — sends silently via EmailJS (no user confirmation needed)
+  if (s.email && s.emailAddress) {
+    sendEmailAlert(title, waMsg, s.emailAddress);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMAIL SENDER (EmailJS — no backend needed)
+// ═══════════════════════════════════════════════════════════════
+function getEmailJSConfig() {
+  return LS.get('routineos_emailjs') || { pubkey: '', service: '', template: '' };
+}
+
+async function sendEmailAlert(subject, body, toEmail) {
+  const cfg = getEmailJSConfig();
+  if (!cfg.pubkey || !cfg.service || !cfg.template || !toEmail) return;
+  try {
+    emailjs.init(cfg.pubkey);
+    await emailjs.send(cfg.service, cfg.template, {
+      to_email: toEmail,
+      subject: subject,
+      message: body,
+      user_name: currentUser || 'RoutineOS User',
+      app_name: 'RoutineOS'
+    });
+  } catch(e) {
+    console.warn('EmailJS send failed:', e);
+  }
+}
+
+async function sendEmailTest() {
+  const s = loadNotifSettings();
+  if (!s.emailAddress) { showToast('Please save your email first.', '⚠️'); return; }
+  const cfg = getEmailJSConfig();
+  if (!cfg.pubkey || !cfg.service || !cfg.template) { showToast('Please save your EmailJS config first.', '⚠️'); return; }
+  showToast('Sending test email...', '📧');
+  await sendEmailAlert(
+    '👋 RoutineOS Test Email',
+    `Hello ${currentUser}!\n\nThis is a test notification from RoutineOS.\nYour email alerts are set up correctly ✅\n\n— RoutineOS`,
+    s.emailAddress
+  );
+  showToast('Test email sent! Check your inbox 📬');
 }
 
 // ═══════════════════════════════════════════════════════════════
